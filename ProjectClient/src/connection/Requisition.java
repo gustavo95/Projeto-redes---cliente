@@ -19,14 +19,14 @@ public class Requisition {
 		this.wasAttend = wasAttend;
 		//this.socket_client = Socket.
 		this.finalRequisition = name_client+ ";" + description +";" + String.valueOf(wasAttend);
-		System.out.println("foi2");
+		
 		
 	}
 	
 	
 	void sendRequisition(Socket socket_destiny) throws IOException{
 		DataOutputStream outToServer = new DataOutputStream(socket_destiny.getOutputStream());
-		System.out.println(finalRequisition);
+		//System.out.println(finalRequisition);
 		outToServer.writeBytes(finalRequisition);
 		
 	}

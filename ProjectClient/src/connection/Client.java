@@ -16,11 +16,11 @@ public class Client {
 				System.in));
 		
 		try{
-			///ONCNC
+			
 			
 			
 			Socket clientSocket = new Socket("localhost",6789);
-			System.out.println("foi");
+			
 			Requisition req = new Requisition("João", "Livro de Calculo", false);
 			req.sendRequisition(clientSocket);
 			
