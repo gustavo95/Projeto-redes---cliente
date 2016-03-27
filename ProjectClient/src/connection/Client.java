@@ -16,6 +16,8 @@ public class Client {
 		
 		try{
 			//FOI!
+			
+			
 			Socket clientSocket = new Socket("localhost", 6789);
 
 			DataOutputStream outToServer = new DataOutputStream(
