@@ -21,7 +21,7 @@ public class Client {
 			
 			Socket clientSocket = new Socket("localhost",6789);
 			
-			Requisition req = new Requisition("João", "Livro de Calculo", false);
+			Requisition req = new Requisition("João", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false);
 			req.sendRequisition(clientSocket);
 			
 			
