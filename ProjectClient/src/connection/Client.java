@@ -16,7 +16,10 @@ public class Client {
 				System.in));
 		
 		try{
+			///ONCNC
 			
+			//brasil
+			///jsoif
 			
 			Socket clientSocket = new Socket("localhost",6789);
 			System.out.println("foi");
