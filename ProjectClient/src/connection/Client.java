@@ -10,17 +10,17 @@ public class Client {
 	public static void main(String argv[]) throws Exception {
 		String sentence;
 		String modifiedSentence;
-		System.out.println("CLIENTE INICIADO, DIGITE UM TEXTO: ");
+		System.out.println("DIGITE UM TEXTO: ");
 
-		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(
-				System.in));
+		//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+		//inFromUser.readLine();
 		
 		try{
 			
 			
 			
 			Socket clientSocket = new Socket("localhost",6789);
-			
+			System.out.println("CLIENTE INICIADO");
 			Requisition req = new Requisition("João", "Livro de Calculo", false);
 			req.sendRequisition(clientSocket);
 			
