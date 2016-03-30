@@ -10,18 +10,18 @@ public class Client {
 	public static void main(String argv[]) throws Exception {
 		String sentence;
 		String modifiedSentence;
-		System.out.println("DIGITE UM TEXTO: ");
+		System.out.println("CLIENTE INICIADO, DIGITE UM TEXTO: ");
 
-		//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-		//inFromUser.readLine();
+		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(
+				System.in));
 		
 		try{
 			
 			
 			
 			Socket clientSocket = new Socket("localhost",6789);
-			System.out.println("CLIENTE INICIADO");
-			Requisition req = new Requisition("João", "Livro de Calculo", false);
+			
+			Requisition req = new Requisition("João", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false);
 			req.sendRequisition(clientSocket);
 			
 			
