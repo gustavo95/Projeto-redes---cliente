@@ -2,11 +2,14 @@ package fileManagement;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 
 public class FileOperations {
 	
@@ -55,6 +58,33 @@ public class FileOperations {
 		String aux = location.replace("\\", "");
 		int i = location.length() - aux.length();
 		return location.split("\\\\")[i];
+	}
+	
+	public byte[] serializeFile(FileToTransfer file){
+		try {
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			
+			ObjectOutputStream ous;
+			ous = new ObjectOutputStream(bao);
+			ous.writeObject(file);
+			
+			return bao.toByteArray();
+			
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
+		return null;
+	}
+	
+	public void sendFile(Socket socket_destiny, FileToTransfer file){
+		try{
+			BufferedOutputStream bf = new BufferedOutputStream(socket_destiny.getOutputStream());
+			bf.write(serializeFile(file));
+			bf.flush();
+			bf.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 }

@@ -8,7 +8,7 @@ public class Requisition {
 
 	String name_client;
 	String name_document;
-	String  description;
+	String description;
 	boolean wasAttend;
 	Socket socket_client;
 	String finalRequisition;
@@ -26,19 +26,12 @@ public class Requisition {
 	}
 	
 	
-	void sendRequisition(Socket socket_destiny) throws IOException{
+	public void sendRequisition(Socket socket_destiny) throws IOException{
 		DataOutputStream outToServer = new DataOutputStream(socket_destiny.getOutputStream());
 		//System.out.println(finalRequisition);
 		String x = socket_destiny.toString();
-		String str = finalRequisition + ";" + x;
-		
+		String str = finalRequisition + ";" + x + "\r\n";
 		outToServer.writeBytes(str);
-		
 	}
-	
-	
-	
-	
-	
 
 }
