@@ -24,7 +24,7 @@ public class Client {
 	public static ArrayList<Requisition> list_of_requisitions  = new ArrayList<Requisition>();
 	public static String nome;
 	public static void main(String argv[]) throws Exception {
-	
+
 		System.out.println("CLIENTE INICIADO");
 
 		try{
@@ -38,12 +38,12 @@ public class Client {
 
 				System.out.println("DIGITE 1 PARA ENVIAR REQUISIÇÃO\n"
 						+ "DIGITE 2 PARA ENVIAR DOCUMENTOS\n"
-						+ "DIGITE 3 PARA PEDIR LISTA DE REQUISIÇÕES\n");
+						+ "DIGITE 4 PARA PEDIR LISTA DE REQUISIÇÕES\n");
 				int value = sc.nextInt();
 				if (value == 1){
 					System.out.println("DIGITE SEU NOME E DEPOIS ENTER ");
 					Scanner x = new Scanner(System.in);
-					 nome = x.next();	
+					nome = x.next();	
 
 					Requisition req = new Requisition(nome, "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false, clientSocket);
 					sendRequisition(req);
@@ -61,7 +61,7 @@ public class Client {
 					//					clientSocket.close();
 				}
 
-				if (value ==3){
+				if (value ==4){
 
 					askForList();
 					//outToServer.writeBytes("0 Exit\n");
@@ -93,13 +93,20 @@ public class Client {
 	}
 	public static void askForList() throws IOException, ClassNotFoundException{
 
-		outToServer.writeBytes("3 Asking\n");
+		outToServer.writeBytes("4 AskList\n");
 		ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
 		list_of_requisitions =(ArrayList<Requisition>) in.readObject();
-		System.out.println(list_of_requisitions.size());
-		for (int i =0 ; i<list_of_requisitions.size(); i++){
-			System.out.println(list_of_requisitions.get(i).getName_client());
-		}
+		System.out.println(list_of_requisitions.size()+ "size");
+		//		for (int i =0 ; i<list_of_requisitions.size(); i++){
+		//			System.out.println(list_of_requisitions.get(i).getName_client());
+		//			
+		//		}
+		
+
+		ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
+		manager.print(nome);
+		
+		
 		//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
 		//System.out.println(manager.separateList(nome, list_of_requisitions)[0].size());
 	}
