@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,6 +153,8 @@ public class Client {
 				os.flush();
 			}
 			
+		}catch (FileNotFoundException e){
+			System.out.println("O arquivo especificado não foi encontrado");
 		}catch (Exception e) {
 			e.printStackTrace();
 		} finally {		
@@ -208,9 +211,10 @@ public class Client {
 				fos.flush();
 			}
 			
+		}catch (FileNotFoundException e){
+			System.out.println("O arquivo especificado não foi encontrado");
 		}catch (Exception e) {
 			e.printStackTrace();
-			
 		} finally {
 			if (dataSocket != null) {
 				try {
