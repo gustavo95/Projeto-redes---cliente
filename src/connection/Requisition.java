@@ -10,14 +10,15 @@ public class Requisition implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String name_client;
+	private Usuario usuario;
 	private String name_document;
 	private String description;
 	private boolean wasAttend;
-	private Socket socket;
+	transient private Socket socket;
 	private ArrayList<Requisition> l;
-	public Requisition(String name_client ,String name_document, String description, boolean wasAttend, Socket socket) {
-		this.name_client = name_client;
+	public Requisition(Usuario usuario,String name_document, String description, boolean wasAttend, Socket socket) {
+		super ();
+		this.usuario = usuario;
 		this.name_document = name_document;
 		this.description = description;
 		this.wasAttend = wasAttend;
@@ -27,22 +28,19 @@ public class Requisition implements Serializable{
 		this.l = l;
 	}
 	
-	public String toString(){
-		return name_client+ ";" + name_document +";" + description +";" + String.valueOf(wasAttend);
-	}
-
-	public String getName_client() {
-		return name_client;
-	}
-
-	public void setName_client(String name_client) {
-		this.name_client = name_client;
-	}
+//	public String toString(){
+//		return name_client+ ";" + name_document +";" + description +";" + String.valueOf(wasAttend);
+//	}
+	
+	
 
 	public String getName_document() {
 		return name_document;
 	}
 
+	public Usuario getUsuario() {
+		return usuario;
+	}
 	public void setName_document(String name_document) {
 		this.name_document = name_document;
 	}
