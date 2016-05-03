@@ -25,6 +25,7 @@ public class Client {
 	public static ArrayList<Requisition> list_of_requisitions  = new ArrayList<Requisition>();
 
 	public static Usuario usuario;
+	@SuppressWarnings("resource")
 	public static void main(String argv[]) throws Exception {
 
 		System.out.println("CLIENTE INICIADO");
@@ -45,17 +46,13 @@ public class Client {
 						+ "DIGITE 6 PARA FAZER LOGIN");
 				int value = sc.nextInt();
 				if (value == 1){
-					//					System.out.println("DIGITE SEU NOME E DEPOIS ENTER ");
-					//					Scanner x = new Scanner(System.in);
-					//					nome = x.next();	
+
+					Scanner x = new Scanner(System.in);
+					String name_document = x.next();	
+					String description = x.next();
+					sendRequisition(name_document, description);
 
 
-					sendRequisition();
-
-					//					Requisition req2 = new Requisition("Joana", "James Stewart Vol I","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false);
-					//					sendRequisition(req2);
-					//					outToServer.writeBytes("0 Exit\n");
-					//					clientSocket.close();
 				}
 				if (value ==2){
 					FileOperations fo = new FileOperations();
@@ -72,11 +69,19 @@ public class Client {
 					//clientSocket.close();
 				}
 				if (value == 5){
-
-					createUser();
+					Scanner x = new Scanner(System.in);
+					String nome = x.next();	
+					String email = x.next();
+					String senha  =  x.next();
+					createUser(nome, email,senha);
 				}
 				if (value ==6){
-					login();
+
+					Scanner x = new Scanner(System.in);
+					String nome = x.next();	
+					String email = x.next();
+					String senha  =  x.next();
+					login(nome, email, senha);
 				}
 			}
 
@@ -85,30 +90,22 @@ public class Client {
 		}
 
 	}
-	public static void login() throws IOException{
-		Scanner x = new Scanner(System.in);
-		String nome = x.next();	
-		String email = x.next();
-		String senha  =  x.next();
-		Usuario user =  new Usuario(nome, email, senha);
+	public static void login(String nome,String email,String senha  ) throws IOException{
+
+		usuario  =  new Usuario(nome, email, senha);
 
 		outToServer.writeBytes("6 Login\n");
 		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 
-		out.writeObject(user);
+		out.writeObject(usuario);
 		out.flush();
-		
-		System.out.println(inFromServer.readLine());
-		
-	}
 
-	public static void createUser() throws IOException{
-		System.out.println("LOGIN" +  "\n" + "--------------------------");
-		
-		Scanner x = new Scanner(System.in);
-		String nome = x.next();	
-		String email = x.next();
-		String senha  =  x.next();
+		System.out.println(inFromServer.readLine());
+
+	}
+	
+	public static void createUser(String nome, String email, String senha) throws IOException{
+
 		Usuario user =  new Usuario(nome, email, senha);
 
 		outToServer.writeBytes("5 CreateUser\n");
@@ -116,17 +113,15 @@ public class Client {
 
 		out.writeObject(user);
 		out.flush();
-		
+
 		System.out.println(inFromServer.readLine());
 		//out.close();
 	}
 
-	public static void sendRequisition() throws IOException{
-		Scanner x = new Scanner(System.in);
-		String name_document = x.next();	
-		String description = x.next();
-		Requisition req = new Requisition(usuario, name_document,description, false, clientSocket);
+	public static void sendRequisition(String name_document, String description) throws IOException{
 		outToServer.writeBytes("1 SendingRequisition\n");
+
+		Requisition req = new Requisition(usuario, name_document,description, false, clientSocket);
 		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 		out.writeObject(req);
 		out.flush();
@@ -143,23 +138,16 @@ public class Client {
 		System.out.println(inFromServer.readLine());
 		bf.close();
 	}
-	public static void askForList() throws IOException, ClassNotFoundException{
+	@SuppressWarnings("unchecked")
+	public static ArrayList<ArrayList<Requisition>>  askForList() throws IOException, ClassNotFoundException{
 
 		outToServer.writeBytes("4 AskList\n");
 		ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
 		list_of_requisitions =(ArrayList<Requisition>) in.readObject();
-		System.out.println(list_of_requisitions.size()+ "size");
-		//		for (int i =0 ; i<list_of_requisitions.size(); i++){
-		//			System.out.println(list_of_requisitions.get(i).getName_client());
-		//			
-		//		}
-
-
 		ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-		manager.print(usuario.getNome());
+		return manager.separateList(usuario.getNome());
+		
 
-
-		//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-		//System.out.println(manager.separateList(nome, list_of_requisitions)[0].size());
+		
 	}
 }

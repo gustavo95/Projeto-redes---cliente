@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 2L;
-	
+
 	String nome, email, senha;
 
 	public Usuario(String nome, String email, String senha) {
@@ -38,6 +38,6 @@ public class Usuario implements Serializable {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
-	
+
 
 }
