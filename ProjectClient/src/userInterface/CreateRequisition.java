@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import connection.User;
 import requisitionManagement.Requisition;
 
 public class CreateRequisition extends JDialog{
@@ -26,7 +27,7 @@ public class CreateRequisition extends JDialog{
     private JButton btnCancel;
     private Requisition requisition;
  
-    public CreateRequisition(Frame parent, String user_name) {
+    public CreateRequisition(Frame parent, User user) {
         super(parent, "Create Requisition", true);
         
         requisition = null;
@@ -64,7 +65,7 @@ public class CreateRequisition extends JDialog{
         btnCreate.addActionListener(new ActionListener() {
  
             public void actionPerformed(ActionEvent e) {
-                requisition = new Requisition(user_name, tfTitle.getText(), tfDescription.getText(), false);
+                requisition = new Requisition(user, tfTitle.getText(), tfDescription.getText(), false);
                 dispose();
             }
         });

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class Client {
 	private static DataOutputStream outToServer;
 	private static BufferedReader inFromServer;
 	private static ArrayList<Requisition> list_of_requisitions  = new ArrayList<Requisition>();
-	private static String nome;
+	private static User user;
 	
 	public static void main(String argv[]) throws Exception {
 
@@ -54,12 +55,12 @@ public class Client {
 					isConnected = false;
 				}
 				if(value == 1){
-					System.out.println("DIGITE SEU NOME E DEPOIS ENTER ");
+					System.out.println("DIGITE SEU name E DEPOIS ENTER ");
 					Scanner x = new Scanner(System.in);
-					nome = x.next();	
+					//name = x.next();	
 
-					Requisition req = new Requisition(nome, "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false);
-					sendRequisition(req);
+					//Requisition req = new Requisition(name, "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false);
+					//sendRequisition(req);
 
 					//					Requisition req2 = new Requisition("Joana", "James Stewart Vol I","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false);
 					//					sendRequisition(req2);
@@ -76,7 +77,7 @@ public class Client {
 				if(value == 4){
 					String fileServerLocation = "";
 					FileOperations fo = new FileOperations();
-					receiveFile(fo.getFileNameByLocation(fileServerLocation), fileServerLocation);
+					//receiveFile(fo.getFileNameByLocation(fileServerLocation), fileServerLocation);
 				}
 			}
 
@@ -91,6 +92,35 @@ public class Client {
 	public static void closeConection() throws IOException{
 		outToServer.writeBytes("0 Exit\n");
 		clientSocket.close();
+	}
+	
+	//Realizar login de um usuario
+	public static void login(String name,String email,String password  ) throws IOException{
+
+		user  =  new User(name, email, password);
+
+		outToServer.writeBytes("6 Login\n");
+		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+
+		out.writeObject(user);
+		out.flush();
+
+		System.out.println(inFromServer.readLine());
+
+	}
+	
+	
+	public static void createUser(String name, String email, String password) throws IOException{
+
+		User user =  new User(name, email, password);
+
+		outToServer.writeBytes("5 CreateUser\n");
+		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+
+		out.writeObject(user);
+		out.flush();
+
+		System.out.println(inFromServer.readLine());
 	}
 	
 	//Enviar Requisição para o servidor
@@ -122,11 +152,10 @@ public class Client {
 
 
 			ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-			manager.print(nome);
 
 
 			//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-			//System.out.println(manager.separateList(nome, list_of_requisitions)[0].size());
+			//System.out.println(manager.separateList(name, list_of_requisitions)[0].size());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -202,7 +231,7 @@ public class Client {
 	}
 
 	//Receber arquivo enviado pelo servidor
-	public static void receiveFile(String fileName, String fileServerLocation){
+	public static void receiveFile(String fileName, String fileServerLocation, String folder){
 		try{
 			Socket dataSocket = null;
 			FileOutputStream fos = null;
@@ -218,7 +247,7 @@ public class Client {
 				is = dataSocket.getInputStream();
 
 				// Cria arquivo local no cliente
-				fos = new FileOutputStream(new File("C://Users//guga//Documents//" + fileName));
+				fos = new FileOutputStream(new File(folder + "//" + fileName));
 
 				// Prepara variaveis para transferencia
 				byte[] cbuffer = new byte[1024];
@@ -261,5 +290,9 @@ public class Client {
 		}catch(IOException e){
 			//do something
 		}
+	}
+	
+	public User getActiveUser(){
+		return user;
 	}
 }

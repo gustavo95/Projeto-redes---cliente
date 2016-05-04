@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 public class ManagerRequisition {
 
-	private ArrayList<Requisition> l;
+	ArrayList<Requisition> l;
 	
+	
+	
+
 	public ManagerRequisition(ArrayList<Requisition> l) {
 		super();
 		this.l = l;
@@ -17,12 +20,12 @@ public class ManagerRequisition {
 		ArrayList<Requisition> myReqs = new ArrayList<Requisition>();
 		ArrayList<Requisition> otherReqs = new ArrayList<Requisition>();
 		for (Requisition i : l){
-			if (i.getName_client().equals(name)){
+			if (i.getUser().getName().equals(name)){
 				//System.out.println("myname" + i.getName_client());
 				//System.out.println(myReqs.size());
 				myReqs.add(i);
 			}
-			if (!i.getName_client().equals(name)){
+			if (!i.getUser().getName().equals(name)){
 				//System.out.println("othername" + i.getName_client());
 				otherReqs.add(i);
 			}
@@ -46,7 +49,7 @@ public class ManagerRequisition {
 		if (!my.equals(null)){
 			for (Requisition i :my){
 
-				System.out.println("Nome: "+i.getName_client()+" Nome do documento: " + i.getName_document());
+				System.out.println("Nome: "+i.getUser().getName()+" Nome do documento: " + i.getName_document());
 
 			}
 		}
@@ -54,9 +57,10 @@ public class ManagerRequisition {
 		if (!others.equals(null)){
 			for (Requisition i :others){
 
-				System.out.println("Nome: "+i.getName_client()+" Nome do documento: " + i.getName_document()+"\n");
+				System.out.println("Nome: "+i.getUser().getName()+" Nome do documento: " + i.getName_document()+"\n");
 
 			}
 		}
 	}
+
 }

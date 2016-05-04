@@ -28,7 +28,6 @@ public class MainMenu extends JDialog{
 
 	private Client clientOperations;
 
-	int i;
 	private Frame parent;
 	private JPanel panel;
 	private GridBagConstraints gbc;
@@ -49,7 +48,6 @@ public class MainMenu extends JDialog{
 		this.parent = parent;
 		this.clientOperations = clientOperations;
 		
-		i  = 0;
 		panel = new JPanel(new GridBagLayout());
 		gbc = new GridBagConstraints();
 		requestsPanel = null;
@@ -76,7 +74,6 @@ public class MainMenu extends JDialog{
 		btnRefresh.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				i++;
 				setRequisitionsList();
 				
 				requestsPanel.revalidate();
@@ -92,7 +89,7 @@ public class MainMenu extends JDialog{
 		btnCreate.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				CreateRequisition cr = new CreateRequisition(parent, userName);
+				CreateRequisition cr = new CreateRequisition(parent, clientOperations.getActiveUser());
 				cr.setVisible(true);
 				cr.getRequisition();
 			}
@@ -153,32 +150,7 @@ public class MainMenu extends JDialog{
 	}
 
 	private void requisitionButtons(){
-		//ArrayList<Requisition> requisitions = clientOperations.askForList();
-
-		ArrayList<Requisition> requisitions = new ArrayList<Requisition>();
-		requisitions.add(new Requisition("Jose", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-		requisitions.add(new Requisition("Jose", "James Stewart Vol I","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", true));
-		requisitions.add(new Requisition("Jose", "gajekekvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-		requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-		requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-		requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-		requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-		requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-		if(i != 0){
-			requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", true));
-			requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-			requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-			requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-			requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-			requisitions.add(new Requisition("Guga", "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false));
-			requisitions.add(new Requisition("Guga", "sjkdflgkddkfgjlkjhjkjhj","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false));
-		}
+		ArrayList<Requisition> requisitions = clientOperations.askForList();
 
 		JLabel requisitionLabel;
 		ImageIcon image;
@@ -197,12 +169,12 @@ public class MainMenu extends JDialog{
 			int indexUserRequests = 0;
 
 			for(Requisition r : requisitions){
-				requisitionLabel = new JLabel(r.getName_client() + " request: " + r.getName_document());
+				requisitionLabel = new JLabel(r.getUser().getName() + " request: " + r.getName_document());
 				imageLabel = new JLabel();
 				cs.gridx = 1;
 				cs.anchor = GridBagConstraints.FIRST_LINE_START;
 
-				if(userName.contentEquals(r.getName_client())){
+				if(userName.contentEquals(r.getUser().getName())){
 					cs.gridy = indexUserRequests;
 					userRequestsPanel.add(requisitionLabel, cs);
 
@@ -216,7 +188,8 @@ public class MainMenu extends JDialog{
 							{  
 								dr.setVisible(true);
 								if(dr.getFile() != null){
-									clientOperations.receiveFile(dr.getFile().getFileName(), dr.getFile().getFilePath());
+									clientOperations.receiveFile(dr.getFile().getFileName(),
+											dr.getFile().getFilePath(), dr.getFolder());
 								}
 							}
 						});
@@ -226,7 +199,8 @@ public class MainMenu extends JDialog{
 							{  
 								dr.setVisible(true);
 								if(dr.getFile() != null){
-									clientOperations.receiveFile(dr.getFile().getFileName(), dr.getFile().getFilePath());
+									clientOperations.receiveFile(dr.getFile().getFileName(),
+											dr.getFile().getFilePath(), dr.getFolder());
 								}
 							}  
 						});
