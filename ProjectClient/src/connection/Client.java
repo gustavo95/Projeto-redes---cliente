@@ -104,140 +104,162 @@ public class Client {
 	}
 	
 	//Receber lista de Requisições
-	public static void askForList() throws IOException, ClassNotFoundException{
+	public static ArrayList<Requisition> askForList(){
+		ArrayList<Requisition> requisitions = null;
+		
+		try {
+			outToServer.writeBytes("2 AskList\n");
 
-		outToServer.writeBytes("2 AskList\n");
-		ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
-		list_of_requisitions =(ArrayList<Requisition>) in.readObject();
-		System.out.println(list_of_requisitions.size()+ "size");
-		//		for (int i =0 ; i<list_of_requisitions.size(); i++){
-		//			System.out.println(list_of_requisitions.get(i).getName_client());
-		//			
-		//		}
-		
+			ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
+			requisitions =(ArrayList<Requisition>) in.readObject();
+			list_of_requisitions = requisitions;
+			
+			System.out.println(list_of_requisitions.size()+ "size");
+			//		for (int i =0 ; i<list_of_requisitions.size(); i++){
+			//			System.out.println(list_of_requisitions.get(i).getName_client());
+			//			
+			//		}
 
-		ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-		manager.print(nome);
+
+			ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
+			manager.print(nome);
+
+
+			//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
+			//System.out.println(manager.separateList(nome, list_of_requisitions)[0].size());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
-		//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-		//System.out.println(manager.separateList(nome, list_of_requisitions)[0].size());
+		return requisitions;
 	}
 
 	//Enviar arquivo do cliente para o servidor
-	public static void sendFile(String fileName, String fileLocation) throws IOException{
-		Socket dataSocket = null;
-		FileInputStream fileIn = null;
-		OutputStream os = null;
-
+	public static void sendFile(String fileName, String fileLocation){
 		try{
-			outToServer.writeBytes("3 SendFile\n");
-			outToServer.writeBytes(fileName + "\n");
-			
-			dataSocket = new Socket("localhost",6790);
+			Socket dataSocket = null;
+			FileInputStream fileIn = null;
+			OutputStream os = null;
 
-			// Criando tamanho de leitura
-			byte[] cbuffer = new byte[1024];
-			int bytesRead;
+			try{
+				outToServer.writeBytes("3 SendFile\n");
+				outToServer.writeBytes(fileName + "\n");
 
-			// Criando arquivo que sera transferido pelo cliente
-			File file = new File(fileLocation);
-			fileIn = new FileInputStream(file);
+				dataSocket = new Socket("localhost",6790);
 
-			// Criando canal de transferencia
-			os = dataSocket.getOutputStream();
+				// Criando tamanho de leitura
+				byte[] cbuffer = new byte[1024];
+				int bytesRead;
 
-			// Lendo arquivo criado e enviado para o canal de transferencia
-			while ((bytesRead = fileIn.read(cbuffer)) != -1) {
-				os.write(cbuffer, 0, bytesRead);
-				os.flush();
-			}
-			
-		}catch (FileNotFoundException e){
-			System.out.println("O arquivo especificado não foi encontrado");
-		}catch (Exception e) {
-			e.printStackTrace();
-		} finally {		
-			if (os != null) {
-				try {
-					os.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				// Criando arquivo que sera transferido pelo cliente
+				File file = new File(fileLocation);
+				fileIn = new FileInputStream(file);
+
+				// Criando canal de transferencia
+				os = dataSocket.getOutputStream();
+
+				// Lendo arquivo criado e enviado para o canal de transferencia
+				while ((bytesRead = fileIn.read(cbuffer)) != -1) {
+					os.write(cbuffer, 0, bytesRead);
+					os.flush();
+				}
+
+			}catch (FileNotFoundException e){
+				System.out.println("O arquivo especificado não foi encontrado");
+			}catch (Exception e) {
+				e.printStackTrace();
+			} finally {		
+				if (os != null) {
+					try {
+						os.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				if (dataSocket != null) {
+					try {
+						dataSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				if (fileIn != null) {
+					try {
+						fileIn.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
-			if (dataSocket != null) {
-				try {
-					dataSocket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (fileIn != null) {
-				try {
-					fileIn.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			System.out.println(inFromServer.readLine());
+		}catch(IOException e){
+			//do something
 		}
-		System.out.println(inFromServer.readLine());
 	}
-	
+
 	//Receber arquivo enviado pelo servidor
-	public static void receiveFile(String fileName, String fileServerLocation) throws IOException{
-		Socket dataSocket = null;
-		FileOutputStream fos = null;
-		InputStream is = null;
-
+	public static void receiveFile(String fileName, String fileServerLocation){
 		try{
-			outToServer.writeBytes("4 ReceiveFile\n");
-			
-			outToServer.writeBytes(fileServerLocation + "\n");
-			
-			dataSocket = new Socket("localhost",6790);
-			
-			is = dataSocket.getInputStream();
+			Socket dataSocket = null;
+			FileOutputStream fos = null;
+			InputStream is = null;
 
-			// Cria arquivo local no cliente
-			fos = new FileOutputStream(new File("C://Users//guga//Documents//" + fileName));
+			try{
+				outToServer.writeBytes("4 ReceiveFile\n");
 
-			// Prepara variaveis para transferencia
-			byte[] cbuffer = new byte[1024];
-			int bytesRead;
+				outToServer.writeBytes(fileServerLocation + "\n");
 
-			// Copia conteudo do canal
-			while ((bytesRead = is.read(cbuffer)) != -1) {
-				fos.write(cbuffer, 0, bytesRead);
-				fos.flush();
-			}
-			
-		}catch (FileNotFoundException e){
-			System.out.println("O arquivo especificado não foi encontrado");
-		}catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (dataSocket != null) {
-				try {
-					dataSocket.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				dataSocket = new Socket("localhost",6790);
+
+				is = dataSocket.getInputStream();
+
+				// Cria arquivo local no cliente
+				fos = new FileOutputStream(new File("C://Users//guga//Documents//" + fileName));
+
+				// Prepara variaveis para transferencia
+				byte[] cbuffer = new byte[1024];
+				int bytesRead;
+
+				// Copia conteudo do canal
+				while ((bytesRead = is.read(cbuffer)) != -1) {
+					fos.write(cbuffer, 0, bytesRead);
+					fos.flush();
+				}
+
+			}catch (FileNotFoundException e){
+				System.out.println("O arquivo especificado não foi encontrado");
+			}catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (dataSocket != null) {
+					try {
+						dataSocket.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if (fos != null) {
+					try {
+						fos.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				}
 			}
-			if (fos != null) {
-				try {
-					fos.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
-			if (is != null) {
-				try {
-					is.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-			}
+			System.out.println(inFromServer.readLine());
+		}catch(IOException e){
+			//do something
 		}
-		System.out.println(inFromServer.readLine());
 	}
 }
