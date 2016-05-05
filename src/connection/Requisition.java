@@ -10,13 +10,13 @@ public class Requisition implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Usuario usuario;
+	private User usuario;
 	private String name_document;
 	private String description;
 	private boolean wasAttend;
 	transient private Socket socket;
 	private ArrayList<Requisition> l;
-	public Requisition(Usuario usuario,String name_document, String description, boolean wasAttend, Socket socket) {
+	public Requisition(User usuario,String name_document, String description, boolean wasAttend, Socket socket) {
 		super ();
 		this.usuario = usuario;
 		this.name_document = name_document;
@@ -38,7 +38,7 @@ public class Requisition implements Serializable{
 		return name_document;
 	}
 
-	public Usuario getUsuario() {
+	public User getUsuario() {
 		return usuario;
 	}
 	public void setName_document(String name_document) {

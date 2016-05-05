@@ -23,8 +23,8 @@ public class Client {
 	private static DataOutputStream outToServer;
 	private static BufferedReader inFromServer;
 	public static ArrayList<Requisition> list_of_requisitions  = new ArrayList<Requisition>();
-
-	public static Usuario usuario;
+	public static boolean state;
+	public static User usuario;
 	@SuppressWarnings("resource")
 	public static void main(String argv[]) throws Exception {
 
@@ -92,7 +92,7 @@ public class Client {
 	}
 	public static void login(String nome,String email,String senha  ) throws IOException{
 
-		usuario  =  new Usuario(nome, email, senha);
+		usuario  =  new User(nome, email, senha);
 
 		outToServer.writeBytes("6 Login\n");
 		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -100,13 +100,22 @@ public class Client {
 		out.writeObject(usuario);
 		out.flush();
 
-		System.out.println(inFromServer.readLine());
+		String x =inFromServer.readLine();
+		if (x.equals("Ok")){
+			state = true;
+
+		}
+		else{
+			state = false;
+
+
+		}
 
 	}
-	
+
 	public static void createUser(String nome, String email, String senha) throws IOException{
 
-		Usuario user =  new Usuario(nome, email, senha);
+		User user =  new User(nome, email, senha);
 
 		outToServer.writeBytes("5 CreateUser\n");
 		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -114,8 +123,13 @@ public class Client {
 		out.writeObject(user);
 		out.flush();
 
-		System.out.println(inFromServer.readLine());
-		//out.close();
+		String x = inFromServer.readLine();
+		if (x.equals("Ok")){
+			state = true;
+		}
+		else{
+			state =false;
+		}
 	}
 
 	public static void sendRequisition(String name_document, String description) throws IOException{
@@ -125,8 +139,13 @@ public class Client {
 		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
 		out.writeObject(req);
 		out.flush();
-
-		System.out.println(inFromServer.readLine());
+		String x = inFromServer.readLine();
+		if (x.equals("Ok")){
+			state = true;
+		}
+		else{
+			state = false;
+		}
 	}
 
 	public static void sendFile(FileToTransfer file) throws IOException{
@@ -141,13 +160,13 @@ public class Client {
 	@SuppressWarnings("unchecked")
 	public static ArrayList<ArrayList<Requisition>>  askForList() throws IOException, ClassNotFoundException{
 
-		outToServer.writeBytes("4 AskList\n");
+		outToServer.writeBytes("2 AskList\n");
 		ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
 		list_of_requisitions =(ArrayList<Requisition>) in.readObject();
 		ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
 		return manager.separateList(usuario.getNome());
-		
 
-		
+
+
 	}
 }

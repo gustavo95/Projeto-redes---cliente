@@ -2,12 +2,12 @@ package connection;
 
 import java.io.Serializable;
 
-public class Usuario implements Serializable {
+public class User implements Serializable {
 	private static final long serialVersionUID = 2L;
 
 	String nome, email, senha;
 
-	public Usuario(String nome, String email, String senha) {
+	public User(String nome, String email, String senha) {
 		super();
 		this.nome = nome;
 		this.email = email;
