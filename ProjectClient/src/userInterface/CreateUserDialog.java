@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -28,8 +29,16 @@ public class CreateUserDialog extends JDialog{
     private JButton btnCreate;
     private JButton btnCancel;
     
+    private String name;
+    private String email;
+    private String password;
+    
     public CreateUserDialog(Frame parent){
     	super(parent, "Create User", true);
+    	
+    	name = null;
+    	email = null;
+    	password = null;
     	
     	JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
@@ -88,7 +97,15 @@ public class CreateUserDialog extends JDialog{
         btnCreate.addActionListener(new ActionListener() {
         	 
             public void actionPerformed(ActionEvent e) {
-            	dispose();
+            	password = new String(pfPassword.getPassword());
+            	if(password.equals(new String(pfConfirmPassword.getPassword()))){
+            		name = tfUsername.getText();
+            		email = tfEmail.getText();
+            		dispose();
+            	}else{
+            		JOptionPane.showMessageDialog(CreateUserDialog.this, "Passwords don't match", "Create User",
+                            JOptionPane.ERROR_MESSAGE);
+            	}
             }
         });
         
@@ -111,4 +128,16 @@ public class CreateUserDialog extends JDialog{
         setResizable(false);
         setLocationRelativeTo(parent);
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
 }

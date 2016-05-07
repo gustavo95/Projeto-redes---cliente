@@ -13,9 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import connection.User;
-import requisitionManagement.Requisition;
-
 public class CreateRequisition extends JDialog{
 	
 	private static final long serialVersionUID = -9015225698293366602L;
@@ -25,12 +22,14 @@ public class CreateRequisition extends JDialog{
     private JLabel lbDescription;
     private JButton btnCreate;
     private JButton btnCancel;
-    private Requisition requisition;
+    private String title;
+    private String description;
  
-    public CreateRequisition(Frame parent, User user) {
+    public CreateRequisition(Frame parent) {
         super(parent, "Create Requisition", true);
         
-        requisition = null;
+        title = null;
+        description = null;
         
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints cs = new GridBagConstraints();
@@ -65,7 +64,8 @@ public class CreateRequisition extends JDialog{
         btnCreate.addActionListener(new ActionListener() {
  
             public void actionPerformed(ActionEvent e) {
-                requisition = new Requisition(user, tfTitle.getText(), tfDescription.getText(), false);
+                title = tfTitle.getText();
+                description = tfDescription.getText();
                 dispose();
             }
         });
@@ -89,9 +89,13 @@ public class CreateRequisition extends JDialog{
         setResizable(false);
         setLocationRelativeTo(parent);
     }
-    
-    public Requisition getRequisition(){
-    	return requisition;
-    }
+
+	public String getTitle() {
+		return title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
 
 }

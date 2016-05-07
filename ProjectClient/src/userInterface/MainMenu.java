@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -40,8 +40,6 @@ public class MainMenu extends JDialog{
 	private JLabel lbSpace;
 	private JButton btnRefresh;
 	private JButton btnCreate;
-	
-	String userName = "Guga";
 
 	public MainMenu(Frame parent, Client clientOperations){
 		super(parent, "Main Menu", true);
@@ -89,9 +87,18 @@ public class MainMenu extends JDialog{
 		btnCreate.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				CreateRequisition cr = new CreateRequisition(parent, clientOperations.getActiveUser());
+				CreateRequisition cr = new CreateRequisition(parent);
 				cr.setVisible(true);
-				cr.getRequisition();
+				if(cr.getTitle() != null){
+					clientOperations.sendRequisition(cr.getTitle(), cr.getDescription());
+					if(clientOperations.getStatus()){
+						JOptionPane.showMessageDialog(MainMenu.this, "Requisition created!", "Create Requisition",
+	                            JOptionPane.INFORMATION_MESSAGE);
+					}else{
+						JOptionPane.showMessageDialog(MainMenu.this, "Could not create requisition!", "Create Requisition",
+	                            JOptionPane.ERROR_MESSAGE);
+					}
+				}
 			}
 		});
 
@@ -174,7 +181,7 @@ public class MainMenu extends JDialog{
 				cs.gridx = 1;
 				cs.anchor = GridBagConstraints.FIRST_LINE_START;
 
-				if(userName.contentEquals(r.getUser().getName())){
+				if(r.getUser().getName().equals(clientOperations.getActiveUser().getName())){
 					cs.gridy = indexUserRequests;
 					userRequestsPanel.add(requisitionLabel, cs);
 

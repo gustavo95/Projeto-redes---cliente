@@ -14,161 +14,212 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import fileManagement.FileOperations;
-import requisitionManagement.ManagerRequisition;
 import requisitionManagement.Requisition;
 
 public class Client {
 	
-	private static Socket clientSocket;
-	private static DataOutputStream outToServer;
-	private static BufferedReader inFromServer;
-	private static ArrayList<Requisition> list_of_requisitions  = new ArrayList<Requisition>();
-	private static User user;
+	private boolean isConnected;
+	private Socket clientSocket;
+	private DataOutputStream outToServer;
+	private BufferedReader inFromServer;
+	private User user;
+	private boolean status;
 	
-	public static void main(String argv[]) throws Exception {
-
-		System.out.println("CLIENTE INICIADO");
-
+	public Client(){
 		try{
-			boolean isConnected = true;
-			Scanner sc = new Scanner(System.in);
 			clientSocket = new Socket("localhost",6789);
 			outToServer = new DataOutputStream(clientSocket.getOutputStream());
 			inFromServer = new BufferedReader(new InputStreamReader(
 					clientSocket.getInputStream()));
-			
-			while (isConnected){
-
-				System.out.println("DIGITE 0 PARA SAIR\n"
-						+ "DIGITE 1 PARA ENVIAR REQUISIÇÃO\n"
-						+ "DIGITE 2 PARA PEDIR LISTA DE REQUISIÇÕES\n"
-						+ "DIGITE 3 PARA ENVIAR DOCUMENTOS\n"
-						+ "DIGITE 4 PARA PEDIR DOCUMENTO\n"
-						);
-				int value = sc.nextInt();
-				if(value == 0){
-					sc.close();
-					closeConection();
-					isConnected = false;
-				}
-				if(value == 1){
-					System.out.println("DIGITE SEU name E DEPOIS ENTER ");
-					Scanner x = new Scanner(System.in);
-					//name = x.next();	
-
-					//Requisition req = new Requisition(name, "James Stewart Vol II","Livro de cálculo utilizado nos cursos de cálculo 2,3 e 4", false);
-					//sendRequisition(req);
-
-					//					Requisition req2 = new Requisition("Joana", "James Stewart Vol I","Livro de cálculo utilizado nos cursos de cálculo 1 e 2", false);
-					//					sendRequisition(req2);
-					//x.close();
-				}
-				if(value == 2){
-					askForList();
-				}
-				if(value == 3){
-					String fileLocation = "";
-					FileOperations fo = new FileOperations();
-					sendFile(fo.getFileNameByLocation(fileLocation), fileLocation);
-				}
-				if(value == 4){
-					String fileServerLocation = "";
-					FileOperations fo = new FileOperations();
-					//receiveFile(fo.getFileNameByLocation(fileServerLocation), fileServerLocation);
-				}
-			}
-
-		}catch(Exception e){
-			System.out.println("Erro de conexão" + e.toString());
-			e.printStackTrace();
+			isConnected = true;
+		}catch(IOException e){
+			isConnected = false;
 		}
-
 	}
 	
 	//Fechar conexão
-	public static void closeConection() throws IOException{
+	public void closeConection(){
+		try{
 		outToServer.writeBytes("0 Exit\n");
 		clientSocket.close();
+		isConnected = false;
+		}catch(IOException e){
+			//TODO
+		}
 	}
 	
 	//Realizar login de um usuario
-	public static void login(String name,String email,String password  ) throws IOException{
+	public void login(String email, String password){
+		Socket dataSocket = null;
+		ObjectOutputStream out = null;
+		
+		try{
+			user  =  new User(null, email, password);
 
-		user  =  new User(name, email, password);
+			outToServer.writeBytes("6 Login\n");
+			
+			dataSocket = new Socket("localhost",6790);
+			out = new ObjectOutputStream(dataSocket.getOutputStream());
 
-		outToServer.writeBytes("6 Login\n");
-		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+			out.writeObject(user);
+			out.flush();
 
-		out.writeObject(user);
-		out.flush();
-
-		System.out.println(inFromServer.readLine());
-
+			String x = inFromServer.readLine();
+			if (x.equals("NotOk")){
+				status = false;
+			}
+			else{
+				user.setName(x);
+				status = true;
+			}
+		}catch (IOException e){
+			status = false;
+		}finally {		
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (dataSocket != null) {
+				try {
+					dataSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
-	
-	public static void createUser(String name, String email, String password) throws IOException{
+	//Criar novo usuario
+	public void createUser(String name, String email, String password){
+		Socket dataSocket = null;
+		ObjectOutputStream out = null;
+		
+		try{
+			User user =  new User(name, email, password);
 
-		User user =  new User(name, email, password);
+			outToServer.writeBytes("5 CreateUser\n");
+			
+			dataSocket = new Socket("localhost",6790);
+			out = new ObjectOutputStream(dataSocket.getOutputStream());
 
-		outToServer.writeBytes("5 CreateUser\n");
-		ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
+			out.writeObject(user);
+			out.flush();
 
-		out.writeObject(user);
-		out.flush();
-
-		System.out.println(inFromServer.readLine());
+			String x = inFromServer.readLine();
+			if (x.equals("Ok")){
+				status = true;
+			}
+			else{
+				status = false;
+			}
+		}catch(IOException e){
+			status = false;
+		}finally {		
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (dataSocket != null) {
+				try {
+					dataSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	//Enviar Requisição para o servidor
-	public static void sendRequisition(Requisition req) throws IOException{
-		String str = req.toString() + ";" + clientSocket.toString() + "\n";
-		
-		outToServer.writeBytes("1 SendingRequisition\n");
-		outToServer.writeBytes(str);
-		
-		System.out.println(inFromServer.readLine());
+	public void sendRequisition(String name_document, String description){
+		Socket dataSocket = null;
+		ObjectOutputStream out = null;
+
+		try{
+			outToServer.writeBytes("1 SendingRequisition\n");
+
+			Requisition req = new Requisition(user, name_document, description, false);
+
+			dataSocket = new Socket("localhost",6790);
+			out = new ObjectOutputStream(dataSocket.getOutputStream());
+
+			out.writeObject(req);
+			out.flush();
+
+			String x = inFromServer.readLine();
+			if (x.equals("Ok")){
+				status = true;
+			}
+			else{
+				status = false;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {		
+			if (out != null) {
+				try {
+					out.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (dataSocket != null) {
+				try {
+					dataSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	//Receber lista de Requisições
-	public static ArrayList<Requisition> askForList(){
+	@SuppressWarnings("unchecked")
+	public ArrayList<Requisition> askForList(){
+		Socket dataSocket = null;
+		ObjectInputStream in = null;
 		ArrayList<Requisition> requisitions = null;
 		
 		try {
 			outToServer.writeBytes("2 AskList\n");
-
-			ObjectInputStream in =   new ObjectInputStream(clientSocket.getInputStream());
-			requisitions =(ArrayList<Requisition>) in.readObject();
-			list_of_requisitions = requisitions;
 			
-			System.out.println(list_of_requisitions.size()+ "size");
-			//		for (int i =0 ; i<list_of_requisitions.size(); i++){
-			//			System.out.println(list_of_requisitions.get(i).getName_client());
-			//			
-			//		}
-
-
-			ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-
-
-			//ManagerRequisition manager = new ManagerRequisition(list_of_requisitions);
-			//System.out.println(manager.separateList(name, list_of_requisitions)[0].size());
+			dataSocket = new Socket("localhost",6790);
+			in =  new ObjectInputStream(dataSocket.getInputStream());
+			
+			requisitions =(ArrayList<Requisition>) in.readObject();
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}finally {		
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (dataSocket != null) {
+				try {
+					dataSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return requisitions;
 	}
 
 	//Enviar arquivo do cliente para o servidor
-	public static void sendFile(String fileName, String fileLocation){
+	public void sendFile(String fileName, String fileLocation){
 		try{
 			Socket dataSocket = null;
 			FileInputStream fileIn = null;
@@ -226,12 +277,12 @@ public class Client {
 			}
 			System.out.println(inFromServer.readLine());
 		}catch(IOException e){
-			//do something
+			//TODO
 		}
 	}
 
 	//Receber arquivo enviado pelo servidor
-	public static void receiveFile(String fileName, String fileServerLocation, String folder){
+	public void receiveFile(String fileName, String fileServerLocation, String folder){
 		try{
 			Socket dataSocket = null;
 			FileOutputStream fos = null;
@@ -294,5 +345,13 @@ public class Client {
 	
 	public User getActiveUser(){
 		return user;
+	}
+	
+	public boolean getStatus(){
+		return status;
+	}
+	
+	public boolean isConnected(){
+		return isConnected;
 	}
 }

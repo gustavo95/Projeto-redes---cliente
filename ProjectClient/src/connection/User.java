@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class User implements Serializable {
 	private static final long serialVersionUID = 2L;
 
-	String name, email, password;
+	private String name, email, password;
 
 	public User(String name, String email, String password) {
 		this.name = name;
